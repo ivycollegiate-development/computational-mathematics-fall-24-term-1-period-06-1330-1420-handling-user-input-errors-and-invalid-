@@ -1,0 +1,47 @@
+name: Autograding Tests
+'on':
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Sprint Project 1.0
+      id: sprint-project-1-0
+      uses: classroom-resources/autograding-python-grader@v1
+      with:
+        timeout: 10
+        max-score: 10
+        setup-command: 
+      import os
+
+          # Define the expected file path for 'Sprint_Project_1.0'
+          def test_sprint_project_exists():
+              expected_file_path = os.path.join(os.getcwd(), 'Sprint_Project_1.2')
+              
+              # Assert that the file exists
+              assert os.path.isfile(expected_file_path), f"File '{expected_file_path}' not found."
+
+          # Define the expected directory path for 'Project_Folder'
+          def test_project_folder_exists():
+              expected_folder_path = os.path.join(os.getcwd(), 'Project_Folder')
+
+              # Assert that the folder exists
+              assert os.path.isdir(expected_folder_path), f"Directory '{expected_folder_path}' not found."
+
+          # Run the tests
+          test_sprint_project_exists()
+          test_project_folder_exists()
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        SPRINT-PROJECT-1-0_RESULTS: "${{steps.sprint-project-1-0.outputs.result}}"
+      with:
+        runners: sprint-project-1-0
